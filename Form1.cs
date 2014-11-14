@@ -121,11 +121,27 @@ namespace tic_tac_toe
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Reallocate grid (reset)
-            grid = new CellSelection[3,3];
+            // Reset grid
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    grid[i, j] = CellSelection.N;
+                }
+            }
 
             // Reset the state of the game
             game.Reset();
+
+            this.Invalidate();
+        }
+
+        private void computerStartsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // The GameEngine handles what move the computer takes
+            game.Update(grid);
+
+            this.Invalidate();
         }
     }
 }

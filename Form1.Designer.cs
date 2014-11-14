@@ -66,6 +66,7 @@
             this.computerStartsToolStripMenuItem.Name = "computerStartsToolStripMenuItem";
             this.computerStartsToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
             this.computerStartsToolStripMenuItem.Text = "&Computer Starts";
+            this.computerStartsToolStripMenuItem.Click += new System.EventHandler(this.computerStartsToolStripMenuItem_Click);
             // 
             // Form1
             // 

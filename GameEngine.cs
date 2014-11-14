@@ -29,6 +29,9 @@ namespace tic_tac_toe
             // Check the board
             this.CheckBoard(board);
 
+            Console.WriteLine(LastMove);
+            Console.WriteLine(GameOver);
+
             if (GameOver)
             {
 
@@ -37,7 +40,6 @@ namespace tic_tac_toe
             {
                 this.ComputerMove(board);
             }
-            
         }
 
         private void CheckBoard(Form1.CellSelection[,] board)
@@ -67,13 +69,23 @@ namespace tic_tac_toe
             }
 
             // Check Diagonals
-            if (board[0, 0] == board[1, 1] && board[0, 0] == board[2,2] && board [1, 1] == board[2,2])
+            for (int i = 0; i < 3; i++)
             {
-                GameOver = true;
+                if (board[i, i] != board[LastMove.X, LastMove.Y])
+                    break;
+                if (i == 2)
+                {
+                    GameOver = true;
+                }
             }
-            if (board[2, 0] == board[1, 1] && board[2,0] == board[0, 2] && board[1, 1] == board[0, 2])
+            for (int i = 0; i < 3; i++)
             {
-                GameOver = true;
+                if (board[i, 2 - i] != board[LastMove.X, LastMove.Y])
+                    break;
+                if (i == 2)
+                {
+                    GameOver = true;
+                }
             }
 
             // Check tie
@@ -114,8 +126,19 @@ namespace tic_tac_toe
 
         public void Reset()
         {
+            // Reset all state variables to prepare for new game
             GameOver = false;
+            Draw = false;
             MoveCount = 0;
+        }
+
+        public bool isOver()
+        {
+            if (GameOver)
+            {
+                return true;
+            }
+            else return false;
         }
     }
 }
