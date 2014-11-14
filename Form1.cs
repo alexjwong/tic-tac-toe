@@ -18,9 +18,17 @@ namespace tic_tac_toe
         private const float block = lineLength / 3;
         private const float offset = 10;
         private const float delta = 5;
-        private enum CellSelection { N, O, X };
-        private CellSelection[,] grid = new CellSelection[3, 3];
         private float scale;            // Current scale factor
+
+
+        public enum CellSelection { N, O, X };
+        public CellSelection[,] grid = new CellSelection[3, 3];
+        
+
+        // Create a game engine
+        private GameEngine game = new GameEngine();
+
+        // Perhaps figure out a way to pass the grid as a reference..
 
 
         public Form1()
@@ -47,7 +55,6 @@ namespace tic_tac_toe
                     if (grid[i, j] == CellSelection.O)
                     {
                         DrawO(i, j, g);
-
                     }
                     else if (grid[i, j] == CellSelection.X)
                     {
@@ -98,14 +105,27 @@ namespace tic_tac_toe
             {
                 if (e.Button == MouseButtons.Left)
                 {
-                    grid[i, j] = CellSelection.O;
+                    grid[i, j] = CellSelection.X;
                 }
                 if (e.Button == MouseButtons.Right)
                 {
-                    grid[i, j] = CellSelection.X;
+                    grid[i, j] = CellSelection.O;
                 }
+                // Get the last move made for easier checking of board
+                game.getLastMove(i, j);
+                // Update the game after a move has been made.
+                game.Update(grid);
                 this.Invalidate();
             }
-        }   
+        }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Reallocate grid (reset)
+            grid = new CellSelection[3,3];
+
+            // Reset the state of the game
+            game.Reset();
+        }
     }
 }
