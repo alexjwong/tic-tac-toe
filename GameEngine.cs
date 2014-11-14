@@ -4,22 +4,29 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace tic_tac_toe
 {
     class GameEngine
     {
+        public enum CellSelection { N, O, X };
+
         private bool GameOver = false;
         private bool Draw = false;
         private int MoveCount = 0;
+        private CellSelection WinningPlayer;
         private Point LastMove;
+
+        // 3x3 array holds the board
+        private CellSelection[,] board = new CellSelection[3, 3];
         
         public GameEngine()
         {
 
         }
 
-        public void Update(Form1.CellSelection[,] board)   // Updates the state of the game
+        public void Update()   // Updates the state of the game
         {
             // Update is called after a move has been made by the user
 
@@ -27,22 +34,29 @@ namespace tic_tac_toe
             this.MoveCount++;
 
             // Check the board
-            this.CheckBoard(board);
+            this.CheckBoard();
 
             Console.WriteLine(LastMove);
             Console.WriteLine(GameOver);
 
             if (GameOver)
             {
-
+                if (WinningPlayer == CellSelection.X)
+                {
+                    MessageBox.Show("You Won!");
+                }
+                else if (WinningPlayer == CellSelection.O)
+                {
+                    MessageBox.Show("You lose.");
+                }
             }
             else // If not, the computer moves
             {
-                this.ComputerMove(board);
+                this.ComputerMove();
             }
         }
 
-        private void CheckBoard(Form1.CellSelection[,] board)
+        private void CheckBoard()
         {
             // Since we know the last move, we can use that to make our checking easier
 
@@ -88,18 +102,27 @@ namespace tic_tac_toe
                 }
             }
 
+            // Set winning player if the game was found to be over
+            if (GameOver)
+            {
+                // If the last move caused the game to end, can find the player from the last move
+                WinningPlayer = board[LastMove.X, LastMove.Y];
+            }
+
             // Check tie
             if (this.MoveCount == 9)
             {
                 Draw = true;
+                MessageBox.Show("It's a draw.");
             }
 
             // Else the game is not over!
         }
 
-        private void ComputerMove(Form1.CellSelection[,] board)
+        private void ComputerMove()
         {
             // If the computer can win
+
 
             // If the computer can't win, look to block
 
@@ -112,16 +135,18 @@ namespace tic_tac_toe
             // Special case if opponent has two opposite corners and player has center, need to play a side!
 
             // if corner NOT taken already, take random corner 
+
+            // Set computermove as the last move
+            // LastMove = new Point(i, j);
         }
 
-        private void CanWin(Form1.CellSelection[,] board, char player)
+        private void CanWin(CellSelection player)
         {
+            // Can only win if there are more than 4 moves
+            if (MoveCount >= 4)
+            {
 
-        }
-
-        public void getLastMove(int i, int j)
-        {
-            LastMove = new Point(i, j);
+            }
         }
 
         public void Reset()
@@ -130,6 +155,17 @@ namespace tic_tac_toe
             GameOver = false;
             Draw = false;
             MoveCount = 0;
+            WinningPlayer = CellSelection.N;
+            LastMove = new Point();
+
+            // Reset the board
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    board[i, j] = CellSelection.N;
+                }
+            }
         }
 
         public bool isOver()
@@ -139,6 +175,27 @@ namespace tic_tac_toe
                 return true;
             }
             else return false;
+        }
+
+        public CellSelection[,] getBoard()
+        {
+            return board;
+        }
+
+        public bool cellIsEmpty(int i, int j)
+        {
+            if (board[i, j] == CellSelection.N)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        public void playerMove(int i, int j)
+        {
+            board[i, j] = CellSelection.X;
+            // Set this as the last move
+            LastMove = new Point(i, j);
         }
     }
 }

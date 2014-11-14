@@ -19,17 +19,9 @@ namespace tic_tac_toe
         private const float offset = 10;
         private const float delta = 5;
         private float scale;            // Current scale factor
-
-
-        public enum CellSelection { N, O, X };
-        public CellSelection[,] grid = new CellSelection[3, 3];
         
-
         // Create a game engine
         private GameEngine game = new GameEngine();
-
-        // Perhaps figure out a way to pass the grid as a reference..
-
 
         public Form1()
         {
@@ -48,15 +40,17 @@ namespace tic_tac_toe
             g.DrawLine(Pens.Black, 0, block, lineLength, block);
             g.DrawLine(Pens.Black, 0, 2 * block, lineLength, 2 * block);
 
+            GameEngine.CellSelection[,] grid = game.getBoard();
+
             for (int i = 0; i < 3; ++i)
             {
                 for (int j = 0; j < 3; ++j)
                 {
-                    if (grid[i, j] == CellSelection.O)
+                    if (grid[i, j] == GameEngine.CellSelection.O)
                     {
                         DrawO(i, j, g);
                     }
-                    else if (grid[i, j] == CellSelection.X)
+                    else if (grid[i, j] == GameEngine.CellSelection.X)
                     {
                         DrawX(i, j, g);
                     }
@@ -95,41 +89,29 @@ namespace tic_tac_toe
             int j = (int)(p[0].Y / block);
             if (i > 2 || j > 2) return;
 
-            if (e.Button == MouseButtons.Middle)
-            {
-                grid[i, j] = CellSelection.N;
-            }
-
             // Only allow setting empty cells
-            if (grid[i, j] == CellSelection.N)
+            // Only play if the game is not over
+            if (game.cellIsEmpty(i,j) && game.isOver() == false)
             {
                 if (e.Button == MouseButtons.Left)
                 {
-                    grid[i, j] = CellSelection.X;
+                    game.playerMove(i, j);
                 }
-                if (e.Button == MouseButtons.Right)
-                {
-                    grid[i, j] = CellSelection.O;
-                }
-                // Get the last move made for easier checking of board
-                game.getLastMove(i, j);
+
                 // Update the game after a move has been made.
-                game.Update(grid);
+                game.Update();
+
+                // Invalidate so that the board updates
                 this.Invalidate();
+            }
+            else if (!game.cellIsEmpty(i, j))
+            {
+                MessageBox.Show("Move not allowed.");
             }
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Reset grid
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    grid[i, j] = CellSelection.N;
-                }
-            }
-
             // Reset the state of the game
             game.Reset();
 
@@ -139,7 +121,7 @@ namespace tic_tac_toe
         private void computerStartsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // The GameEngine handles what move the computer takes
-            game.Update(grid);
+            game.Update();
 
             this.Invalidate();
         }
