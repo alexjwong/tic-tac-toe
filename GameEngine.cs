@@ -38,6 +38,7 @@ namespace tic_tac_toe
 
             Console.WriteLine(LastMove);
             Console.WriteLine(GameOver);
+            Console.WriteLine(CanWin(CellSelection.X));
 
             if (GameOver)
             {
@@ -122,9 +123,18 @@ namespace tic_tac_toe
         private void ComputerMove()
         {
             // If the computer can win
-
+            if (CanWin(CellSelection.O).Item1 == true)
+            {
+                board[CanWin(CellSelection.O).Item2.X, CanWin(CellSelection.O).Item2.Y] = CellSelection.O;
+                LastMove = new Point(CanWin(CellSelection.O).Item2.X, CanWin(CellSelection.O).Item2.Y);
+            }
 
             // If the computer can't win, look to block
+            else if (CanWin(CellSelection.X).Item1 == true)
+            {
+                board[CanWin(CellSelection.X).Item2.X, CanWin(CellSelection.X).Item2.Y] = CellSelection.O;
+                LastMove = new Point(CanWin(CellSelection.X).Item2.X, CanWin(CellSelection.X).Item2.Y);
+            }
 
             // If the computer can't do either, play an intelligent move
 
@@ -134,19 +144,93 @@ namespace tic_tac_toe
 
             // Special case if opponent has two opposite corners and player has center, need to play a side!
 
-            // if corner NOT taken already, take random corner 
+            // if corner NOT taken already, take random corner
 
             // Set computermove as the last move
             // LastMove = new Point(i, j);
         }
 
-        private void CanWin(CellSelection player)
+        private Tuple<bool, Point> CanWin(CellSelection player)
         {
+            // Returns if the player can win, and the spot if so.
+            Point spot = new Point();
             // Can only win if there are more than 4 moves
-            if (MoveCount >= 4)
+            // Horizontals
+            for (int i = 0; i < 3; i++)
             {
-
+                int SpotCount = 0;
+                for (int j = 0; j < 3; j++)
+                {
+                    if (board[i, j] == player)
+                    {
+                        SpotCount++;
+                    }
+                    else spot = new Point(i, j);
+                }
+                // If there are two spots taken
+                if (SpotCount == 2 && board[spot.X, spot.Y] == CellSelection.N)
+                {
+                    return Tuple.Create(true, spot);
+                }
             }
+            // Verticals
+            for (int j = 0; j < 3; j++)
+            {
+                int SpotCount = 0;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (board[i, j] == player)
+                    {
+                        SpotCount++;
+                    }
+                    else spot = new Point(i, j);
+                }
+                // If there are two spots taken
+                if (SpotCount == 2 && board[spot.X, spot.Y] == CellSelection.N)
+                {
+                    return Tuple.Create(true, spot);
+                }
+            }
+            // Diagonals
+            while (true)
+            {
+                int SpotCount = 0;
+
+                for (int i = 0; i < 3; i++)
+                {
+                    if (board[i, i] == player)
+                    {
+                        SpotCount++;
+                    }
+                    else spot = new Point(i, i);
+                }
+                if (SpotCount == 2 && board[spot.X, spot.Y] == CellSelection.N)
+                {
+                    return Tuple.Create(true, spot);
+                }
+                else break;
+            }
+
+            while (true)
+            {
+                int SpotCount = 0;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (board[i, 2 - i] == player)
+                    {
+                        SpotCount++;
+                    }
+                    else spot = new Point(i, 2 - i);
+                }
+                if (SpotCount == 2 && board[spot.X, spot.Y] == CellSelection.N)
+                {
+                    return Tuple.Create(true, spot);
+                }
+                else break;
+            }
+            
+            // If can't find any spot that a player can win, return false
+            return Tuple.Create(false, spot);
         }
 
         public void Reset()
@@ -170,6 +254,7 @@ namespace tic_tac_toe
 
         public bool isOver()
         {
+            // Returns true if the game is over.
             if (GameOver)
             {
                 return true;
@@ -179,11 +264,13 @@ namespace tic_tac_toe
 
         public CellSelection[,] getBoard()
         {
+            // Returns the current state of the board (for drawing purposes)
             return board;
         }
 
         public bool cellIsEmpty(int i, int j)
         {
+            // Returns true if a cell is empty
             if (board[i, j] == CellSelection.N)
             {
                 return true;
@@ -193,6 +280,8 @@ namespace tic_tac_toe
 
         public void playerMove(int i, int j)
         {
+            // Inputs the player's move to the board based on coordinates
+            // received from the GUI
             board[i, j] = CellSelection.X;
             // Set this as the last move
             LastMove = new Point(i, j);
