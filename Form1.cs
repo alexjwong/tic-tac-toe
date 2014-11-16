@@ -96,14 +96,21 @@ namespace tic_tac_toe
                 if (e.Button == MouseButtons.Left)
                 {
                     game.playerMove(i, j);
+                    // Update the game after a move has been made.
+                    game.Update();
+                    if (!game.isOver())
+                    {
+                        // Recheck to see if the game is over after player move
+                        game.computerMove();
+                    }
                 }
-
-                // Update the game after a move has been made.
-                game.Update();
-                game.computerMove();
-
+                
                 // Invalidate so that the board updates
                 this.Invalidate();
+            }
+            else if (game.isOver() == true)
+            {
+                // Do nothing
             }
             else if (!game.cellIsEmpty(i, j))
             {
@@ -122,7 +129,17 @@ namespace tic_tac_toe
         private void computerStartsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // The GameEngine handles what move the computer takes
-            game.computerMove();
+            // Computer first is disabled after the first move
+            if (game.getMoveCount() < 1)
+            {
+                game.computerMove();
+            }
+
+            if (game.isOver())
+            {
+                game.Reset();
+                game.computerMove();
+            }
 
             this.Invalidate();
         }

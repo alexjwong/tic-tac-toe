@@ -34,9 +34,11 @@ namespace tic_tac_toe
             // Check the board
             this.CheckBoard();
 
+            /* Debug stuff
             Console.WriteLine("MoveCount: "+MoveCount);
             Console.WriteLine("LastMove: " +LastMove);
             Console.WriteLine("GameOver: " +GameOver);
+             */
         }
 
         private void CheckBoard()
@@ -119,33 +121,18 @@ namespace tic_tac_toe
             // If the computer can win
             if (CanWin(CellSelection.O).Item1 == true)
             {
-                board[CanWin(CellSelection.O).Item2.X, CanWin(CellSelection.O).Item2.Y] = CellSelection.O;
                 LastMove = new Point(CanWin(CellSelection.O).Item2.X, CanWin(CellSelection.O).Item2.Y);
+                board[CanWin(CellSelection.O).Item2.X, CanWin(CellSelection.O).Item2.Y] = CellSelection.O;
             }
 
             // If the computer can't win, look to block if player can win
             else if (CanWin(CellSelection.X).Item1 == true)
             {
-                board[CanWin(CellSelection.X).Item2.X, CanWin(CellSelection.X).Item2.Y] = CellSelection.O;
                 LastMove = new Point(CanWin(CellSelection.X).Item2.X, CanWin(CellSelection.X).Item2.Y);
+                board[CanWin(CellSelection.X).Item2.X, CanWin(CellSelection.X).Item2.Y] = CellSelection.O;
             }
 
             // If the computer can't do either, play an intelligent move
-
-            // If computer is playing first, pick a random corner
-            /*
-            else if (MoveCount == 0)
-            {
-                int corner = random.Next(4);
-                switch (corner)
-                {
-                    case 0: board[0, 0] = CellSelection.O; LastMove = new Point(0, 0); break;
-                    case 1: board[0, 2] = CellSelection.O; LastMove = new Point(0, 2); break;
-                    case 2: board[2, 0] = CellSelection.O; LastMove = new Point(2, 0); break;
-                    case 3: board[2, 2] = CellSelection.O; LastMove = new Point(2, 0); break;
-                }
-            }
-            */
 
             // If opponent moves corner for first move, computer must choose center
             else if (MoveCount == 1 && (board[0,0] == CellSelection.X || board[2,0] == CellSelection.X 
@@ -164,7 +151,7 @@ namespace tic_tac_toe
                     case 0: board[0, 0] = CellSelection.O; LastMove = new Point(0, 0); break;
                     case 1: board[0, 2] = CellSelection.O; LastMove = new Point(0, 2); break;
                     case 2: board[2, 0] = CellSelection.O; LastMove = new Point(2, 0); break;
-                    case 3: board[2, 2] = CellSelection.O; LastMove = new Point(2, 0); break;
+                    case 3: board[2, 2] = CellSelection.O; LastMove = new Point(2, 2); break;
                 }
             }
 
@@ -224,7 +211,7 @@ namespace tic_tac_toe
                         int side = random.Next(sides.Count);
                         if (board[sides[side].X, sides[side].Y] == CellSelection.N)
                         {
-                            board[sides[side].X, corners[side].Y] = CellSelection.O;
+                            board[sides[side].X, sides[side].Y] = CellSelection.O;
                             LastMove = sides[side];
                             SideFound = true;
                             MoveFound = true;
@@ -240,7 +227,7 @@ namespace tic_tac_toe
 
             // Increment MoveCounter
             MoveCount++;
-            this.CheckBoard();
+            this.Update();
         }
 
         private Tuple<bool, Point> CanWin(CellSelection player)
@@ -352,7 +339,7 @@ namespace tic_tac_toe
         public bool isOver()
         {
             // Returns true if the game is over.
-            if (GameOver)
+            if (GameOver || Draw)
             {
                 return true;
             }
@@ -384,6 +371,11 @@ namespace tic_tac_toe
             LastMove = new Point(i, j);
             // Increment MoveCounter
             MoveCount++;
+        }
+
+        public int getMoveCount()
+        {
+            return MoveCount;
         }
     }
 }
