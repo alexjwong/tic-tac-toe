@@ -17,6 +17,7 @@ namespace tic_tac_toe
         private int MoveCount = 0;
         private CellSelection WinningPlayer;
         private Point LastMove;
+        private Random random = new Random();
 
         // 3x3 array holds the board
         private CellSelection[,] board = new CellSelection[3, 3];
@@ -30,36 +31,17 @@ namespace tic_tac_toe
         {
             // Update is called after a move has been made by the user
 
-            // Increment the move counter
-            this.MoveCount++;
-
             // Check the board
             this.CheckBoard();
 
-            Console.WriteLine(LastMove);
-            Console.WriteLine(GameOver);
-            Console.WriteLine(CanWin(CellSelection.X));
-
-            if (GameOver)
-            {
-                if (WinningPlayer == CellSelection.X)
-                {
-                    MessageBox.Show("You Won!");
-                }
-                else if (WinningPlayer == CellSelection.O)
-                {
-                    MessageBox.Show("You lose.");
-                }
-            }
-            else // If not, the computer moves
-            {
-                this.ComputerMove();
-            }
+            Console.WriteLine("MoveCount: "+MoveCount);
+            Console.WriteLine("LastMove: " +LastMove);
+            Console.WriteLine("GameOver: " +GameOver);
         }
 
         private void CheckBoard()
         {
-            // Since we know the last move, we can use that to make our checking easier
+            // We use the last move made to make our checking easier
 
             // Check columns
             for (int i = 0; i < 3; i++)
@@ -72,7 +54,7 @@ namespace tic_tac_toe
                 }
             }
 
-            // Check Rows
+            // Check rows
             for (int i = 0; i < 3; i++)
             {
                 if (board[i, LastMove.Y] != board[LastMove.X, LastMove.Y])
@@ -83,7 +65,7 @@ namespace tic_tac_toe
                 }
             }
 
-            // Check Diagonals
+            // Check diagonals
             for (int i = 0; i < 3; i++)
             {
                 if (board[i, i] != board[LastMove.X, LastMove.Y])
@@ -110,8 +92,20 @@ namespace tic_tac_toe
                 WinningPlayer = board[LastMove.X, LastMove.Y];
             }
 
+            if (GameOver)
+            {
+                if (WinningPlayer == CellSelection.X)
+                {
+                    MessageBox.Show("You Won!");
+                }
+                else if (WinningPlayer == CellSelection.O)
+                {
+                    MessageBox.Show("You lose.");
+                }
+            }
+
             // Check tie
-            if (this.MoveCount == 9)
+            if (!GameOver && this.MoveCount == 9)
             {
                 Draw = true;
                 MessageBox.Show("It's a draw.");
@@ -120,7 +114,7 @@ namespace tic_tac_toe
             // Else the game is not over!
         }
 
-        private void ComputerMove()
+        public void computerMove()
         {
             // If the computer can win
             if (CanWin(CellSelection.O).Item1 == true)
@@ -129,7 +123,7 @@ namespace tic_tac_toe
                 LastMove = new Point(CanWin(CellSelection.O).Item2.X, CanWin(CellSelection.O).Item2.Y);
             }
 
-            // If the computer can't win, look to block
+            // If the computer can't win, look to block if player can win
             else if (CanWin(CellSelection.X).Item1 == true)
             {
                 board[CanWin(CellSelection.X).Item2.X, CanWin(CellSelection.X).Item2.Y] = CellSelection.O;
@@ -138,24 +132,125 @@ namespace tic_tac_toe
 
             // If the computer can't do either, play an intelligent move
 
-            // If opponent moves corner for first move, computer must choose center
+            // If computer is playing first, pick a random corner
+            /*
+            else if (MoveCount == 0)
+            {
+                int corner = random.Next(4);
+                switch (corner)
+                {
+                    case 0: board[0, 0] = CellSelection.O; LastMove = new Point(0, 0); break;
+                    case 1: board[0, 2] = CellSelection.O; LastMove = new Point(0, 2); break;
+                    case 2: board[2, 0] = CellSelection.O; LastMove = new Point(2, 0); break;
+                    case 3: board[2, 2] = CellSelection.O; LastMove = new Point(2, 0); break;
+                }
+            }
+            */
 
-            // If center taken, take corner
+            // If opponent moves corner for first move, computer must choose center
+            else if (MoveCount == 1 && (board[0,0] == CellSelection.X || board[2,0] == CellSelection.X 
+                || board[0,2] == CellSelection.X || board[2,2] == CellSelection.X))
+            {
+                board[1,1] = CellSelection.O;
+                LastMove = new Point(1,1);
+            }
+
+            // If center taken as the player first move, take random corner
+            else if (MoveCount == 1 && board[1,1] == CellSelection.X)
+            {
+                int corner = random.Next(4);
+                switch (corner)
+                {
+                    case 0: board[0, 0] = CellSelection.O; LastMove = new Point(0, 0); break;
+                    case 1: board[0, 2] = CellSelection.O; LastMove = new Point(0, 2); break;
+                    case 2: board[2, 0] = CellSelection.O; LastMove = new Point(2, 0); break;
+                    case 3: board[2, 2] = CellSelection.O; LastMove = new Point(2, 0); break;
+                }
+            }
 
             // Special case if opponent has two opposite corners and player has center, need to play a side!
+            else if ((board[0, 0] == CellSelection.X && board[2, 2] == CellSelection.X)
+                || (board[2, 0] == CellSelection.X && board[0, 2] == CellSelection.X) && board[1, 1] == CellSelection.O && MoveCount == 3)
+            {
+                int side = random.Next(4);
+                switch (side)
+                {
+                    case 0: if (board[1, 0] == CellSelection.N) board[1, 0] = CellSelection.O; LastMove = new Point(1, 0); break;
+                    case 1: if (board[0, 1] == CellSelection.N) board[0, 1] = CellSelection.O; LastMove = new Point(0, 1); break;
+                    case 2: if (board[2, 1] == CellSelection.N) board[2, 1] = CellSelection.O; LastMove = new Point(2, 1); break;
+                    case 3: if (board[1, 2] == CellSelection.N) board[1, 2] = CellSelection.O; LastMove = new Point(1, 2); break;
+                }
+            }
 
-            // if corner NOT taken already, take random corner
+            // If no special moves, try to find a basic move
+            else
+            {
+                bool MoveFound = false;
+                while (MoveFound == false)
+                {
+                    // Corners
+                    List<Point> corners = new List<Point> { new Point(0, 0), new Point(0, 2), new Point(2, 0), new Point(2, 2) };
+                    bool CornerFound = false;
+                    while (CornerFound == false && MoveFound == false && corners.Count != 0)
+                    {
+                        int corner = random.Next(corners.Count);
+                        if (board[corners[corner].X, corners[corner].Y] == CellSelection.N)
+                        {
+                            board[corners[corner].X, corners[corner].Y] = CellSelection.O;
+                            LastMove = corners[corner];
+                            CornerFound = true;
+                            MoveFound = true;
+                        }
+                        else // Corner taken
+                        {
+                            // Remove the corner that is taken and try again
+                            corners.RemoveAt(corner);
+                        }
+                    }
 
-            // Set computermove as the last move
-            // LastMove = new Point(i, j);
+                    // Center
+                    if (board[1, 1] == CellSelection.N && MoveFound == false)
+                    {
+                        board[1, 1] = CellSelection.O;
+                        LastMove = new Point(0, 0);
+                        break;
+                    }
+
+                    // Sides
+                    List<Point> sides = new List<Point> { new Point(1, 0), new Point(0, 1), new Point(2, 1), new Point(1, 2) };
+                    bool SideFound = false;
+                    while (SideFound == false && MoveFound == false && sides.Count != 0)
+                    {
+                        int side = random.Next(sides.Count);
+                        if (board[sides[side].X, sides[side].Y] == CellSelection.N)
+                        {
+                            board[sides[side].X, corners[side].Y] = CellSelection.O;
+                            LastMove = sides[side];
+                            SideFound = true;
+                            MoveFound = true;
+                        }
+                        else // Side taken
+                        {
+                            // Remove the side that is taken and try again
+                            sides.RemoveAt(side);
+                        }
+                    }
+                }
+            }
+
+            // Increment MoveCounter
+            MoveCount++;
+            this.CheckBoard();
         }
 
         private Tuple<bool, Point> CanWin(CellSelection player)
         {
             // Returns if the player can win, and the spot if so.
+            
+            // The spot to return
             Point spot = new Point();
-            // Can only win if there are more than 4 moves
-            // Horizontals
+            
+            // Check verticals
             for (int i = 0; i < 3; i++)
             {
                 int SpotCount = 0;
@@ -173,7 +268,7 @@ namespace tic_tac_toe
                     return Tuple.Create(true, spot);
                 }
             }
-            // Verticals
+            // Check horizontals
             for (int j = 0; j < 3; j++)
             {
                 int SpotCount = 0;
@@ -194,6 +289,7 @@ namespace tic_tac_toe
             // Diagonals
             while (true)
             {
+                // Regular diagonal
                 int SpotCount = 0;
 
                 for (int i = 0; i < 3; i++)
@@ -213,6 +309,7 @@ namespace tic_tac_toe
 
             while (true)
             {
+                // Anti-diagonal
                 int SpotCount = 0;
                 for (int i = 0; i < 3; i++)
                 {
@@ -285,6 +382,8 @@ namespace tic_tac_toe
             board[i, j] = CellSelection.X;
             // Set this as the last move
             LastMove = new Point(i, j);
+            // Increment MoveCounter
+            MoveCount++;
         }
     }
 }

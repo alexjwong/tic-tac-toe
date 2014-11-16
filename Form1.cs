@@ -100,6 +100,7 @@ namespace tic_tac_toe
 
                 // Update the game after a move has been made.
                 game.Update();
+                game.computerMove();
 
                 // Invalidate so that the board updates
                 this.Invalidate();
@@ -121,7 +122,7 @@ namespace tic_tac_toe
         private void computerStartsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // The GameEngine handles what move the computer takes
-            game.Update();
+            game.computerMove();
 
             this.Invalidate();
         }
